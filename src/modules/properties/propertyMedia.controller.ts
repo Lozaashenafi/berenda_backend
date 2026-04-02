@@ -3,7 +3,7 @@ import prisma from "../../config/prisma";
 
 export const uploadPropertyImage = async (req: Request, res: Response) => {
   try {
-    const { propertyId } = req.params;
+        const propertyId = req.params.propertyId as string;
     const file = req.file as any;
 
     if (!file) {

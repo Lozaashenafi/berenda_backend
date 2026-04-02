@@ -265,7 +265,8 @@ export const initializePayment = async (req: Request, res: Response) => {
 // 2. Verify Payment Callback
 export const verifyPayment = async (req: Request, res: Response) => {
   try {
-    const { txRef } = req.params;
+    const txRef  = req.params.txRef as string;
+    
 
     const payment = await prisma.payment.findUnique({
       where: { txRef },

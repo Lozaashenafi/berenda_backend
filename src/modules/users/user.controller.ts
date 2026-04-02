@@ -91,7 +91,7 @@ export const updateProfile = async (req: Request, res: Response) => {
     const { fullName, phone, location } = req.body;
 
     const profileImageUrl = req.file
-      ? req.file.path || req.file.secure_url || `/uploads/${req.file.filename}`
+      ? req.file.path || (req.file as any).secure_url || `/uploads/${req.file.filename}`
       : undefined;
 
     const updatedUser = await prisma.user.update({

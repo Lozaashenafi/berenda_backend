@@ -5,6 +5,15 @@ import prisma from "../config/prisma";
 const JWT_SECRET = process.env.JWT_ACCESS_SECRET || "superlongrandomaccesssecret";
 const JWT_EXPIRES = process.env.JWT_ACCESS_EXPIRES || "15m";
 
+// Define an interface for the Google Token response
+interface GoogleTokenPayload {
+  email: string;
+  name?: string;
+  picture?: string;
+  aud: string;
+  [key: string]: any;
+}
+
 export const registerUser = async (
   email: string,
   password: string,
@@ -70,7 +79,7 @@ export const loginUser = async (email: string, password: string) => {
   const isMatch = await bcrypt.compare(password, user.passwordHash);
   if (!isMatch) throw new Error("Invalid credentials");
 
-  const roleNames = user.roles.map(r => r.role.name);
+  const roleNames = user.roles.map((r) => r.role.name);
   
   const token = jwt.sign(
     { 
@@ -80,7 +89,7 @@ export const loginUser = async (email: string, password: string) => {
       isAdmin: roleNames.includes("ADMIN") || roleNames.includes("SUPER_ADMIN")
     }, 
     JWT_SECRET, 
-    { expiresIn: JWT_EXPIRES }
+    { expiresIn: JWT_EXPIRES as jwt.SignOptions["expiresIn"] }
   );
 
   return { user, token };
@@ -90,7 +99,9 @@ export const loginWithGoogle = async (idToken: string) => {
   const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
   const res = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`);
   if (!res.ok) throw new Error("Invalid Google ID token");
-  const payload = await res.json();
+  
+  // Cast the response to our interface
+  const payload = (await res.json()) as GoogleTokenPayload;
 
   if (GOOGLE_CLIENT_ID && payload.aud !== GOOGLE_CLIENT_ID) {
     throw new Error("Google ID token audience mismatch");
@@ -156,7 +167,8 @@ export const loginWithGoogle = async (idToken: string) => {
     });
   }
   
-  const roleNames = user.roles.map(r => r.role.name);
+  // user is now guaranteed to be non-null and include roles
+  const roleNames = user.roles.map((r) => r.role.name);
   
   const token = jwt.sign(
     { 
@@ -166,7 +178,7 @@ export const loginWithGoogle = async (idToken: string) => {
       isAdmin: roleNames.includes("ADMIN") || roleNames.includes("SUPER_ADMIN")
     }, 
     JWT_SECRET, 
-    { expiresIn: JWT_EXPIRES }
+    { expiresIn: JWT_EXPIRES as jwt.SignOptions["expiresIn"] }
   );
   
   return { user, token };

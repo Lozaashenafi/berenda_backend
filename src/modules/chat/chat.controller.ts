@@ -177,7 +177,9 @@ export const getChatById = async (req: Request, res: Response) => {
   try {
     const userFromToken = (req as any).user;
     const userId = userFromToken?.userId || userFromToken?.id;
-    const { chatId } = req.params;
+    // const { chatId } = req.params;
+        const chatId = req.params.id as string;
+
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -229,7 +231,7 @@ export const getMessages = async (req: Request, res: Response) => {
   try {
     const userFromToken = (req as any).user;
     const userId = userFromToken?.userId || userFromToken?.id;
-    const { chatId } = req.params;
+    const chatId = req.params.id as string;
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -273,7 +275,7 @@ export const sendMessage = async (req: Request, res: Response) => {
   try {
     const userFromToken = (req as any).user;
     const userId = userFromToken?.userId || userFromToken?.id;
-    const { chatId } = req.params;
+    const chatId = req.params.id as string;
     const { message } = req.body;
 
     if (!userId) {

@@ -114,7 +114,7 @@ export const getBookingById = async (req: Request, res: Response) => {
   try {
     const userFromToken = (req as any).user;
     const userId = userFromToken?.userId || userFromToken?.id;
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const booking = await prisma.booking.findFirst({
       where: { id, renterId: userId },
@@ -146,10 +146,10 @@ export const cancelBooking = async (req: Request, res: Response) => {
   try {
     const userFromToken = (req as any).user;
     const userId = userFromToken?.userId || userFromToken?.id;
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     const booking = await prisma.booking.updateMany({
-      where: { id, renterId: userId },
+        where: { id , renterId: userId },
       data: { status: "cancelled" }
     });
 
